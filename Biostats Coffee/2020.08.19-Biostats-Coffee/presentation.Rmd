@@ -1,0 +1,191 @@
+--- 
+title: "waspr: an R package for computing Wasserstein barycenters of subset posteriors"
+author: "Jolien Cremers"
+date: "August 19th, 2020"
+output:
+  # ioslides_presentation:
+  #   citation_package: natbib
+  #   css: css/style.css
+  #   transition: 0
+  #   self_contained: TRUE
+  beamer_presentation:
+    citation_package: natbib
+bibliography: paper.bib
+biblio-style: "apalike"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+## Parallel computation for MCMC
+
+* Averaging
+* Consensus Monte Carlo [@Scott2016-wu]
+* Semiparametric density product estimators [@Neiswanger2013-nk]
+* Wasserstein barycenters for subset posteriors [@Srivastava2015-hf;@Srivastava2018-zw]
+
+
+
+
+
+## Wasserstein distance {.smaller}
+
+A geometric distance between probability measures used in transportation theory. 
+
+E.g.: $X \sim L$, $Y \sim Q$ with densities $l$ and $q$ with finite $p$th moments and $X, Y \in \mathbb{R}^d$. Let $\mathcal{J}(L, Q)$ denote all joint distributions $J$ for $(X, Y)$ that have marginals $L$ and $Q$, then the Wasserstein distance is:
+
+$$W_p(L,Q) = \left( \inf_{J\in\mathcal{J}(L,Q)}\int ||x-y||^pdJ(x,y\right)^{1/p},$$
+where $p\geq1$. The minimizer $J^*$ is called the 'optimal transport plan' or 'optimal coupling'
+
+
+
+
+
+## Wasserstein barycenters {.smaller}
+
+Suppose we have a set of distributions $Q_1, \dots, Q_N$, the Wasserstein barycenter is then defined as the distribution $Q$ that minimizes:
+
+$$\sum_{j=1}^N W(Q, Q_j)$$
+
+<!-- The barycenter $\mu$ of $n$ probability measures $\mu_1, \dots, \mu_n \in P_2(\mathbb{R}^d)$ with finite second moments using the $L^2$-Wasserstein metric for measuring distances is any solution of: -->
+
+<!-- $$inf \left\{ \sum_{i=1}^{n} W_2^2(\mu_i, \mu); \mu \in P_2(\mathbb{R}^d) \right\} $$ -->
+
+<!-- $L^2$-Wasserstein metric: -->
+
+<!-- $$W_2^2(\mu, \nu):= inf \left\{ \int_{\mathbb{R}^d \times \mathbb{R}^d} ||x-y|| dP(x, y); P\in M(\mu, \nu)\right\} $$ -->
+<!-- where $M(\mu, \nu)$ denotes the set of probability measures on $\mathbb{R}^d \times \mathbb{R}^d$ with marginals $\mu, \nu \in P_2(\mathbb{R}^d)$. -->
+
+
+
+
+
+## Computation {.smaller}
+
+When $d = 1$ computation of $W(L, Q)$ is easy. 
+
+If $L$ and $Q$ are the empirical distributions of two datasets $X_1, \dots, X_n$ and $Y_1, \dots, Y_n$ the distance takes the following function of the order statistics:
+
+$$W_p(L, Q) = \left( \sum_{i=1}^n||X_{(i)} - Y_{(i)}||^p\right)^{1/p} $$
+
+Otherwise we need linear programming or other algorithms to compute the Wasserstein distance and barycenter.
+
+
+
+
+
+## Iterative swapping algorithm {.smaller}
+
+Barycenter $\mu$ of $n$ probability measures $\mu_1, \dots, \mu_n \in P_2(\mathbb{R}^d)$.
+
+**@Puccetti2020-es:**
+
+* $X_i$ is an optimal n-coupling if and only if the distribution $\bar{\mu}_n$ of $\bar{S}_n := \sum_{i=1}^n x_i/n$ is a barycenter of $\mu_i$
+
+* Optimal n-couplings $X_i = (X_1, \dots, X_n)$ are defined as solutions of $$sup \left\{\mathbb{E} [f(X_1, \dots, X_n)]; X_i \sim \mu_i, 1 \leq i < n\right\}$$ where $f(X_1, \dots, X_n) = \sum_{i=1}^n \langle x_i, \sum_{j \neq i} x_j \rangle$.
+
+* Use an iterative version of the swapping algorithm from @Puccetti2017-zl.
+
+
+
+
+## Iterative swapping algorithm {.smaller}
+
+$n$ = number of pre-assigned probability measures (subposteriors)  
+$k$ = number of atoms of empirical measures (MCMC samples)  
+$d$ = dimensionality of the space $\mathbb{R}^d$ (parameters)
+
+1. Start with an assignment $x_{\sigma_1}^1, \dots, x_{\sigma_n}^n$ where $\sigma_1, \dots, \sigma_n \in \Sigma_k$ and $\Sigma_k$ denotes the set of all permutations of $\{1, \dots, k\}$.
+2. Swapping condition for a fixed $i \in \{1, \dots, n\}$, and indices $1 \leq k_1 < k_2 \leq k$: $$ \small \langle x_{\sigma_i(k_1)}^i, \sum_{j \neq 1} x_{\sigma_j(k_1)}^j \rangle + \langle x_{\sigma_i(k_2)}^i, \sum_{j \neq 1} x_{\sigma_j(k_2)}^j \rangle < \langle x_{\sigma_i(k_2)}^i, \sum_{j \neq 1} x_{\sigma_j(k_1)}^j\rangle + \langle x_{\sigma_i(k_1)}^i, \sum_{j \neq 1} x_{\sigma_j(k_2)}^j\rangle $$
+3. If condition holds, swap $\sigma_i(k_1)$ and $\sigma_i(k_2)$. A new assignment $\{\sigma_1', \dots, \sigma_n' \}$ is found.
+4. Repeat 3 with $\sigma = \sigma'$ until no further swaps are possible and output the final assignment $\{\hat{\sigma_1}, \dots, \hat{\sigma_n}\}$
+
+
+
+
+
+## Assumptions WASP
+
+The subset posterior distributions should provide a noisy approximation fo the full data posterior. Problematic in rare event data.
+
+Exact assumptions and proofs for when WASP converges to the full data posterior given in @Srivastava2018-zw. 
+
+
+
+
+
+## waspr {.smaller}
+
+\scriptsize
+```{r message=FALSE}
+library(waspr)
+```
+
+```{r}
+
+out <- wasp(pois_logistic,
+            iter = 10,
+            acc = 0.001,
+            par.names = c("beta_s", "alpha_l", "beta_l",
+                         "baseline_sigma", "baseline_mu",
+                         "correlation", "sigma_s", "sigma_l"))
+
+```
+\normalsize
+
+
+
+## waspr {.smaller}
+
+\scriptsize
+```{r}
+summary(out)
+```
+\normalsize
+
+
+
+
+## Poisson-logistic joint model
+
+Hierarchical logistic:
+
+$$\pi_{it} = P(Y_{it} = 1 \mid \boldsymbol{x}_{it}, b_{i}) =  \frac{1}{1 +  \exp(-\boldsymbol{x}_{it}\boldsymbol{\beta} + b_{i})}$$
+$b_{i}$ = random intercept
+
+Hierarchical Poisson log-linear model (proportional hazards model with piece-wise constant baseline hazard):
+
+$$\log\mu_{it} = \log t_{it} + \boldsymbol{x}_{it}\boldsymbol{\eta} + \alpha_t + u_i,$$
+
+$\mu_{it}$ = hazard, $\alpha_t = \log \lambda_t = \mu_{\lambda} + N(0, \sigma_{\lambda})$, $u_i$ = frailty, $t_{it}$ = offset
+
+
+
+
+
+## Poisson-logistic joint model
+
+Random intercept $b_{i}$ and frailty $u_i$ assumed to follow a multivariate normal distribution with the following variance-covariance matrix:
+
+$$\boldsymbol{\Sigma} = \begin{bmatrix} \sigma_{b}^2 & \sigma_{bu} \\ \sigma_{bu} & \sigma_u^2 \end{bmatrix}$$
+
+
+
+
+## Simulation results
+
+$N = 6000$, $n_i = 30$, 8 subsets
+
+```{r, echo = FALSE, results = FALSE}
+res_1 <- readRDS("C:/Users/bsj777/Onderzoek/presentations/Biostats Coffee/2020.08.19-Biostats-Coffee/latest/res_1.rds")
+```
+
+```{r, echo = FALSE}
+round(res_1$summary, 2)
+mean(res_1$time)
+```
+
+# References
