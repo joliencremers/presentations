@@ -1,0 +1,389 @@
+--- 
+title: "Retiring today keeps the doctor away? The causal effect of early retirement on medication use"
+author: "Jolien Cremers"
+date: "September 10th, 2020"
+institute: "Section of Biostatistics, University of Copenhagen & Statistics Denmark"
+output:
+  # ioslides_presentation:
+  #   citation_package: natbib
+  #   css: css/style.css
+  #   transition: 0
+  #   self_contained: TRUE
+  beamer_presentation:
+    citation_package: natbib
+header-includes:
+   - \usepackage{colortbl}   
+   - \usepackage{tikz}
+   - \usepackage{amsmath}
+   - \usetikzlibrary{positioning}
+bibliography: paper.bib
+biblio-style: "apalike"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Conclusion: perhaps
+
+\begin{table}
+\centering
+\tiny
+\caption{Log odds ratios for the causal effect of retirement at age 60 on medication use (yes/no) at age 60-60.5}
+\begin{tabular}{ll llll} 
+ \hline\hline
+ & & \multicolumn{4}{l}{MED} \\
+ & predictor & all & painkillers & blood pressure & antidepressants \\[0.5ex]
+ \hline
+OLS &  retired at 60 & 0.03 & 0.26$^{**}$ & 0.14 & 0.16\\
+Reduced form &  1954 cohort & 0.06 & 0.03 & -0.08$^{*}$ & -0.02\\
+\rowcolor{gray!20}TSLS &  retired at 60  & -2.12$^{***}$ & -0.64 & 2.48$^{*}$ & -0.01 \\
+ & 1954 cohort & -1.44$^{***}$ & -1.44$^{***}$ & -1.44$^{***}$ & -1.44$^{***}$ \\
+\rowcolor{gray!20}G-estimation &  retired at 60  & -2.34${^*}$ & -0.56 & 2.22$^{**}$ & 0.54\\
+ \hline\hline
+ \multicolumn{6}{l}{Note: $^{***}$ indicates significance at the $\alpha = 0.001$ level, $^{**}$ indicates significance at the}\\
+ \multicolumn{6}{l}{$\alpha = 0.01$ level and ${^*}$ indicates significance at the $\alpha = 0.05$ level}\\
+\end{tabular}
+
+\label{tab:res_main}
+\end{table}
+
+\tiny
+
+Painkillers: M02AA, N02A, N02B (antiinflammatory preparations, non-steroids for topical use, opioids, other analgesics and antipyretics) 
+
+Medication to reduce blood pressure: C02, C03, C07, C08, C09 (antihypertensives, diuretics, beta blocking agents, calcium channel blockers, agents acting on the renin-angiotensin system)
+
+Antidepressants and medications for anxiety and sleep disorders: N05B N05C, N06A, N06C (anxiolytics, hypnotics and sedatives, antidepressants, psycholeptics and psychoanaleptics in combination)
+
+(N02BE01, N02BE05, N02BA01, N02BA51, N02BB51 and 200 mg M01AE01 are not included) 
+
+
+
+
+
+## Conclusion: subgroups
+
+\begin{table}
+\centering
+\tiny
+\caption{Log odds ratios for the causal effect of retirement at age 60 on medication use (yes/no) at age 60-60.5 for different subgroups}
+\begin{tabular}{ll llll} 
+ \hline\hline
+  & & \multicolumn{4}{l}{MED} \\
+ subgroup & & all & painkillers & blood pressure & antidepressants \\[0.5ex]
+ \hline
+blue-collar & TSLS & -0.22 & -1.68 & 2.63 & 0.87 \\
+& G-estimation & -0.15 & -1.43$^{*}$ & 2.15 & 0.86\\
+ \hline
+lower white-collar & TSLS & -2.86$^{*}$ & -0.88 & 0.77 & 0.32\\
+& G-estimation & NA & -0.75 & 0.90 & 1.08\\
+ \hline
+upper white-collar & TSLS & -5.50$^{***}$ & 0.63 & 2.69 & -0.73 \\
+& G-estimation & NA & 0.73 & 1.91 & -1.14\\
+ \hline
+no occupation & TSLS & -0.82 & -0.12 & 4.35 & -0.60 \\
+& G-estimation & -0.89 & 0.24 & 3.83$^{**}$ & 0.99 \\
+ \hline
+females & TSLS &-1.88$^{*}$  & -0.60 & 3.58$^{**}$ & -0.18\\
+& G-estimation & -2.04 & -0.57 & 3.16$^{***}$ & 0.49\\
+ \hline
+males & TSLS & -2.57$^{*}$ & -0.53 & 0.31 & 0.69\\
+& G-estimation & -2.49 & -0.55 & 0.43 & 0.73\\
+ \hline\hline
+ \multicolumn{6}{l}{Note: $^{***}$ indicates significance at the $\alpha = 0.001$ level, $^{**}$ indicates significance at the}\\
+ \multicolumn{6}{l}{$\alpha = 0.01$ level and ${^*}$ indicates significance at the $\alpha = 0.05$ level}\\
+\end{tabular}
+
+\label{tab:res_heterogeneity}
+\end{table}
+
+
+
+
+
+## Design
+
+\begin{table}
+\centering
+\caption{Ages at which Early Retirement Pension (ERP) is available according to date of birth.}
+\begin{tabular}{ ll }
+\hline\hline
+ Date of Birth & ERP age \\ \hline
+ $<$ 1954 & 60 \\  
+ $\geq$ 01-January-1954 & 60.5 \\   
+ $\geq$ 01-July-1954 & 61 \\   
+ $\geq$ 01-January-1955 & 61.5 \\   
+ $\geq$ 01-July-1955 & 62 \\     
+ $\geq$ 01-January-1956 & 62.5 \\  
+ $\geq$ 01-July-1956 & 63 \\         
+ $\geq$ 01-January-1959 & 63.5 \\
+ $\geq$ 01-July-1959 & 64 \\   
+ $>$ 1963 & computed in relation \\
+ & to life expectancy \\\hline\hline
+\end{tabular}
+\label{tab:ERP_age}
+\end{table}
+
+
+
+
+
+## Design
+
+\begin{figure}
+ \centering
+  \includegraphics[width = 0.7\linewidth]{Plots/Pop_tilstand_prop.pdf}
+  \caption{Attachment to the labour market over time for two cohorts.}
+  \label{fig:attachment_pop}
+\end{figure}
+
+
+
+
+## Design
+
+\begin{figure}
+\label{fig:dagreal}
+\centering
+	\large{\begin{tikzpicture}[%
+		->,
+		>=stealth,
+		node distance=1cm,
+		pil/.style={
+			->,
+			thick,
+			shorten =2pt,}
+		]
+		\node (1) {YOB};
+		\node[right=of 1] (2) {R};
+		\node[below right = of 1](3){S, O, MH};
+		\node[above right = of 2](4){UC};
+		\node[right=of 2] (5) {MED};
+		\draw [->] (1) to (2);
+		\draw [->] (2) to (5);
+		\draw [->] (3) to (1);
+		\draw [->] (3) to (5);
+		\draw [->] (4) to (2);
+		\draw [->] (4) to (5);
+	\end{tikzpicture}}
+	\caption{MED=medication use, R=retirement at age 60, YOB=year of birth(1954/1953), O=type of occupation (longest held 45-55), MH=medication history (\#DDD 59.5-60), S=sex, UC=unmeasured confounders.}
+\end{figure}
+
+\begin{align}\label{eq:tsls}\nonumber
+&\text{MED}_{i} = \beta_0 + \beta_1\text{R}_i + \beta_2\text{S}_i + \beta_3\text{O}_i + \beta_4\text{MH}_i + u_i \\ \nonumber
+& \text{R}_i =  \gamma_0 + \gamma_1\text{YOB}_i + \gamma_2\text{S}_i + \gamma_3\text{O}_i + \gamma_4\text{MH}_i + \nu_i
+\end{align}
+
+
+
+
+
+
+## IV DAG assumptions
+
+\begin{figure}
+\label{fig:dagreal}
+\centering
+	\large{\begin{tikzpicture}[%
+		->,
+		>=stealth,
+		node distance=1cm,
+		pil/.style={
+			->,
+			thick,
+			shorten =2pt,}
+		]
+		\node (1) {YOB};
+		\node[right=of 1] (2) {R};
+		\node[below right = of 1](3){S, O, MH};
+		\node[above right = of 2](4){UC};
+		\node[right=of 2] (5) {MED};
+		\draw [->] (1) to (2);
+		\draw [->] (2) to (5);
+		\draw [->] (1) to (3);
+		\draw [->] (3) to (5);
+		\draw [->] (4) to (2);
+		\draw [->] (4) to (5);
+	\end{tikzpicture}}
+	\caption{MED=medication use, R=retirement at age 60, YOB=year of birth(1954/1953), O=type of occupation (longest held 45-55), MH=medication history (\#DDD 59.5-60), S=sex, UC=unmeasured confounders.}
+\end{figure}
+
+## IV DAG assumptions
+
+\begin{figure}
+\label{fig:dagreal}
+\centering
+	\large{\begin{tikzpicture}[%
+		->,
+		>=stealth,
+		node distance=1cm,
+		pil/.style={
+			->,
+			thick,
+			shorten =2pt,}
+		]
+		\node (1) {YOB};
+		\node[right=of 1] (2) {R};
+		\node[below right = of 1](3){S, O, MH};
+		\node[above right = of 2](4){UC};
+		\node[right=of 2] (5) {MED};
+		\draw [->] (1) to (2);
+		\draw [->] (2) to (5);
+		\draw [->] (1) to (3);
+		\draw [->] (3) to (5);
+		\draw [->] (4) to (2);
+		\draw [->] (4) to (5);
+		\draw [->] (4) to (3);
+	\end{tikzpicture}}
+	\caption{MED=medication use, R=retirement at age 60, YOB=year of birth(1954/1953), O=type of occupation (longest held 45-55), MH=medication history (\#DDD 59.5-60), S=sex, UC=unmeasured confounders.}
+\end{figure}
+
+## IV DAG assumptions
+
+\begin{figure}
+\label{fig:dagreal}
+\centering
+	\large{\begin{tikzpicture}[%
+		->,
+		>=stealth,
+		node distance=1cm,
+		pil/.style={
+			->,
+			thick,
+			shorten =2pt,}
+		]
+		\node (1) {YOB};
+		\node[right=of 1] (2) {R};
+		\node[below right = of 1](3){S, O, MH};
+		\node[above right = of 2](4){UC};
+		\node[right=of 2] (5) {MED};
+		\draw [->] (1) to (2);
+		\draw [->] (2) to (5);
+		\draw [->] (4) to (2);
+		\draw [->] (4) to (5);
+		\draw [->] (4) to (1);
+		\draw [->] (1) to (4);
+	\end{tikzpicture}}
+	\caption{MED=medication use, R=retirement at age 60, YOB=year of birth(1954/1953), O=type of occupation (longest held 45-55), MH=medication history (\#DDD 59.5-60), S=sex, UC=unmeasured confounders.}
+\end{figure}
+
+
+## Extension \& Discussion
+
+* 1950-1957 cohorts
+* G-estimation for zero-inflated outcomes
+
+* IV assumptions 2 \& 3 (exclusion restriction and randomization criterion)?
+* different medication types?
+
+
+
+
+
+
+## Medication frequencies
+
+\begin{table}
+\centering
+\tiny
+\caption{Most frequently used types of prescription medication ($\leq$15\%) in the period 2008-2017 among individuals aged 58-63 that have used prescription medication at least once.}
+\begin{tabular}{ lll }
+\hline\hline
+ medication type (ATC) & percentage & subtypes ($\leq$10\%)\\ \hline
+ antiinfectives for systemic use (J01) & 68\% & penicillins \\
+ antiinflammatory and antirheumatic products (M01) & 46\% & ibuprofen\\
+ analgesics (N02) & 45\% & paracetamol, tramadol \\
+ agents acting on the renin-angiotensin system (C09) & 32\% & ACE inhibitors (plain), \\
+ & & Angiotensin II receptor blockers (plain)\\
+ lipid modifying agents (C10) & 30\% & HMG C0A reductase inhibitors\\
+ drugs for acid related disorders (A02) & 29\% & proton pump inhibitors\\
+ opthalmologicals (S01) & 28\%& antibiotics\\
+ corticosteroids, dermatological preparations (D07) & 28\% & corticosteroids, (potent, group III) \\
+ psycholeptics (N05) & 21\% & benzodiazepine derivatives + related drugs \\
+ antithrombotic agents (B01) & 21\%& platelet aggregation inhibitors\\
+ diuretics (C03) & 20\%& thiazides and potassium in combination\\
+ calcium channel blockers (C08) & 19\% & dihydropyridine derivatives\\
+ antifungals for dermatological use (D01) & 17\%& imidazole and triazole derivatives\\
+ beta blocking agents (C07) & 17\% & beta blocking agents (selective)\\
+ psychoanaleptics (N06) & 17\% & selective serotonin reuptake inhibitors\\
+ drugs for obstructive airway diseases (R03) & 16\% & selective beta-2-adrenoreceptor agonists\\
+ cough and cold preparations (R05) & 16\% & -\\
+ sex hormones and modulators of the genital system (G03) & 15\%& estradiol\\
+ \hline\hline 
+\end{tabular}
+\label{tab:MED_freq}
+\end{table}
+
+
+
+
+
+
+
+## Results 1950 comparison
+
+\begin{table}
+\centering
+\tiny
+\caption{Log odds ratios for the causal effect of retirement at age 60 on medication use (yes/no) at age 60-60.5}
+\begin{tabular}{ll llll} 
+ \hline\hline
+ & & \multicolumn{4}{l}{MED} \\
+ & predictor & all & painkillers & blood pressure & antidepressants \\[0.5ex]
+ \hline
+OLS &  retired at 60 & 0.01 & 0.25$^{**}$ & 0.08 & 0.11\\
+Reduced form &  1954 cohort & -0.03 & 0.18$^{***}$ & -0.11$^{**}$ & -0.12$^{***}$\\
+\rowcolor{gray!20}TSLS &  retired at 60  & 0.83 & -4.20$^{***}$ & 2.60$^{**}$ & 2.81$^{***}$ \\
+ & 1954 cohort & -1.46$^{***}$ & -1.48$^{***}$ & -1.47$^{***}$ & -1.47$^{***}$ \\
+\rowcolor{gray!20}G-estimation &  retired at 60  & 0.81 & -2.06$^{***}$ & 2.56$^{***}$ & 4.86$^{***}$\\
+ \hline\hline
+ \multicolumn{6}{l}{Note: $^{***}$ indicates significance at the $\alpha = 0.001$ level, $^{**}$ indicates significance at the}\\
+ \multicolumn{6}{l}{$\alpha = 0.01$ level and ${^*}$ indicates significance at the $\alpha = 0.05$ level}\\
+\end{tabular}
+
+\label{tab:res_main50}
+\end{table}
+
+
+
+
+
+## Results 1950 comparison
+
+\begin{table}
+\centering
+\tiny
+\caption{Log odds ratios for the causal effect of retirement at age 60 on medication use (yes/no) at age 60-60.5 for different subgroups}
+\begin{tabular}{ll llll} 
+ \hline\hline
+  & & \multicolumn{4}{l}{MED} \\
+ subgroup & & all & painkillers & blood pressure & antidepressants \\[0.5ex]
+ \hline
+blue-collar & TSLS & 1.29 & -5.29$^{***}$ & 1.08 & 2.84 \\
+& G-estimation &  1.31 & -2.37$^{***}$ & 1.35 & 5.24\\
+ \hline
+lower white-collar & TSLS & 0.21 & -5.21$^{***}$ & 2.80 & 4.07$^{**}$\\
+& G-estimation &  0.19 & -2.39$^{***}$ & 2.72$^{**}$ & NA\\
+ \hline
+upper white-collar & TSLS & 0.25 & -2.12 & 4.56$^{*}$ & 2.03 \\
+& G-estimation & -0.06 & -1.59$^{*}$ & 3.17$^{**}$ & 2.83\\
+ \hline
+no occupation & TSLS & 2.20 & -1.35 & 2.57 & -1.97 \\
+G-estimation & 2.65 & -0.98 & 2.99$^{*}$ & 0.29 \\
+ \hline
+females & TSLS &  0.82  & -4.16$^{***}$ & 2.47$^{*}$ & 3.05$^{**}$\\
+& G-estimation & 0.74 & -2.15$^{***}$ & 2.58$^{***}$ & 4.69$^{*}$\\
+ \hline
+males &  TSLS & 0.78 & -4.07$^{**}$ & 2.93 & 2.69$^{*}$\\
+& G-estimation & 1.05 & -1.96$^{***}$ & 2.67$^{**}$ & 5.30\\
+ \hline\hline
+ \multicolumn{6}{l}{Note: $^{***}$ indicates significance at the $\alpha = 0.001$ level, $^{**}$ indicates significance at the}\\
+ \multicolumn{6}{l}{$\alpha = 0.01$ level and ${^*}$ indicates significance at the $\alpha = 0.05$ level}\\
+\end{tabular}
+
+\label{tab:res_heterogeneity50}
+\end{table}
+
+
