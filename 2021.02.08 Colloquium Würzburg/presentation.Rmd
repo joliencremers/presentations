@@ -1,0 +1,481 @@
+--- 
+title: "A short introduction to circular data analysis"
+author: "Jolien Cremers"
+date: "February 8th, 2020"
+institute: | 
+  | Section of Biostatistics, University of Copenhagen
+  | Statistics Denmark
+  | jcre@sund.ku.dk
+output:
+  # ioslides_presentation:
+  #   citation_package: natbib
+  #   css: css/style.css
+  #   transition: 0
+  #   self_contained: TRUE
+  beamer_presentation:
+    keep_tex: true
+    latex_engine: pdflatex
+    
+csl: apa.csl
+pandoc_args: --natbib
+bibliography: bibliography_circular.bib
+
+header-includes:
+   - \usepackage{colortbl}   
+   - \usepackage{tikz}
+   - \usepackage{amsmath}
+   - \usetikzlibrary{positioning}
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r echo = FALSE}
+library(bpnreg)
+library(circular)
+library(tikzDevice)
+library(plotrix)
+library(dplyr)
+library(haven)
+library(bpnreg)
+```
+
+```{r, echo = FALSE}
+data <- read.table("DatatoSamplerPointingNorth.txt", header = TRUE, sep = "\t", dec = ".")
+data$sex <- factor(data$sex, labels = c("male", "female"))
+```
+
+# What is circular data?
+
+A variable $\theta$ defined on $[0, 2\pi)$ radians or $[0, 360)$ degrees:
+
+\begin{figure}[H]
+        \centering
+
+\includegraphics[width=\textwidth]{plots/Circular.png}
+
+		\label{}
+\end{figure}
+
+
+# Three different types of circular data
+
+* Directions in 2D space / Compass data
+
+* Time of day / clock times
+
+* Circular measurement scales
+
+
+# Directions in 2D space / compass data
+\small
+
+Spatial cognition:
+
+* Brunyé, T. T., Burte, H., Houck, L. A., & Taylor, H. A. (2015). The map in our head is not oriented north: Evidence from a real-world environment.
+
+* Postma, A., Zuidhoek, S., Noordzij, M. L., & Kappers, A. M. (2008). Keep an eye on your hands: on the role of visual mechanisms in processing of haptic space.
+
+Eye movements:
+
+* Mulder, K., Klugkist, I., van Renswoude, D., & Visser, I. (2020). Mixtures of peaked power Batschelet distributions for circular data with application to saccade directions.
+
+# Time of day / clock times
+\small
+
+Phase difference:
+
+* Puglisi, G., Leonetti, A., Landau, A., Fornia, L., Cerri, G., & Borroni, P. (2017). The role of attention in human motor resonance.
+
+
+Time of day:
+
+* Rocchi, M. B., & Perlini, C. (2002). Is the time of suicide a random choice? A new statistical perspective. 
+
+* Brunsdon, C., & Corcoran, J. (2006). Using circular statistics to analyse time patterns in crime incidence. 
+
+Circadian rhythms:
+
+* Peeters, F., Berkhof, J., Delespaul, P., Rottenberg, J., & Nicolson, N. A. (2006). Diurnal mood variation in major depressive disorder.
+
+
+
+# Circular measurement scales
+\small
+
+Rose of Leary:
+
+  * Leary, T. (1958). Interpersonal diagnosis of personality. 
+  
+Interpersonal circumplex:
+
+  * Gurtman, M. B. (2009). Exploring personality with the interpersonal circumplex.
+
+\begin{figure}[H]
+
+
+\includegraphics[width=0.4\textwidth]{plots/Leary.png}
+
+		\label{}
+\end{figure}
+
+# Why do we need different analysis methods?
+
+\begin{figure}[H]
+        \centering
+
+\includegraphics[width=\textwidth]{plots/Circular.png}
+
+		\label{}
+\end{figure}
+
+
+# Circular summary statistics
+
+```{r meanrbar, echo = FALSE}
+par(mfrow = c(2,2),
+    oma=c(0,0,0,0),
+    mar=c(0,0,0,0),
+    las=1, mgp=c(4,1,0),
+    xaxs="r", yaxs="r")
+plot(0, 0,  asp = 1, bty='n', axes = FALSE, xlab = "", ylab = "",  xlim = c(-1, 3), ylim = c(-1, 2))
+plotrix::draw.circle(0, 0, 1)
+arrows(c(0, 0, 0), c(0, 0, 0), cos(c(1, 0.5, 5)), sin(c(1, 0.5, 5)), length = 0.05)
+plot(0, 0,  asp = 1, bty='n', axes = FALSE, xlab = "", ylab = "",  xaxs="r", yaxs="r", xlim = c(-1, 3), ylim = c(-1, 2))
+plotrix::draw.circle(0, 0, 1)
+arrows(c(0, cos(1), cos(1) + cos(0.5)),
+       c(0, sin(1), sin(1) + sin(0.5)),
+       c(cos(1), cos(1) + cos(0.5), cos(1) + cos(0.5) + cos(5)),
+       c(sin(1), sin(1) + sin(0.5), sin(1) + sin(0.5) + sin(5)),
+       length = 0.05)
+arrows(0, 0, cos(1) + cos(0.5) + cos(5), sin(1) + sin(0.5) + sin(5), lty = 2, length = 0.05)
+
+plot(0, 0,  asp = 1, bty='n', axes = FALSE, xlab = "", ylab = "",  xaxs="r", yaxs="r", xlim = c(-1, 3), ylim = c(-1, 2))
+plotrix::draw.circle(0, 0, 1)
+arrows(c(0, 0, 0), c(0, 0, 0), cos(c(0.3, 0.4, 0.5)), sin(c(0.3, 0.4, 0.5)), length = 0.05)
+plot(0, 0,  asp = 1, bty='n', axes = FALSE, xlab = "", ylab = "",  xaxs="r", yaxs="r", xlim = c(-1, 3), ylim = c(-1, 2))
+plotrix::draw.circle(0, 0, 1)
+arrows(c(0, cos(0.3), cos(0.3) + cos(0.4)),
+       c(0, sin(0.3), sin(0.3) + sin(0.4)),
+       c(cos(0.3), cos(0.3) + cos(0.4), cos(0.3) + cos(0.4) + cos(0.5)),
+       c(sin(0.3), sin(0.3) + sin(0.4), sin(0.3) + sin(0.4) + sin(0.5)),
+       length = 0.05)
+arrows(0, 0, cos(0.3) + cos(0.4) + cos(0.5), sin(0.3) + sin(0.4) + sin(0.5), lty = 2, length = 0.05)
+``` 
+
+# Circular mean direction
+
+$$\bar{\theta} = \begin{cases} \tan^{-1}\left(\frac{\sum_{i=1}^n\sin\theta_i}{\sum_{i=1}^n\cos\theta_i}\right) & \sum_{i=1}^n\sin\theta_i > 0, \sum_{i=1}^n\cos\theta_i > 0 \\\tan^{-1}\left(\frac{\sum_{i=1}^n\sin\theta_i}{\sum_{i=1}^n\cos\theta_i}\right) + \pi & \sum_{i=1}^n\cos\theta_i < 0 \\ \tan^{-1}\left(\frac{\sum_{i=1}^n\sin\theta_i}{\sum_{i=1}^n\cos\theta_i}\right) + 2\pi & \sum_{i=1}^n\sin\theta_i < 0, \sum_{i=1}^n\cos\theta_i > 0\end{cases}$$
+
+# Mean resultant length
+
+$$R = \sqrt{\left(\sum_{i=1}^n\cos\theta_i\right)^2 + \left(\sum_{i=1}^n\sin\theta_i\right)^2}$$
+$$\bar{R} = R/n$$
+
+1 = All datapoints have the same value
+
+0 $\neq$ uniform, e.g. bimodality at exactly opposite parts of the circle (0$^\circ$, 180$^\circ$) also leads to a zero value.
+
+# Other summary statistics
+
+* circular variance, $V = 1-\bar{R}$
+* circular standard deviation $v = {-2\log(1-V)}^{0.5}$
+* circular median direction 
+* circular modal direction
+
+see @fisher1995statistical for an overview.
+
+# Circular distributions
+
+Three classes:
+
+* Intrinsic distributions (e.g. von Mises)
+* Wrapped distributions ($\theta \sim N(\mu, \sigma)\: \text{mod}\: 2\pi$)
+* Projected distributions ($\theta = (\sin\theta, \cos\theta)^t = \boldsymbol{y} \sim N_2(\boldsymbol{\mu}, \boldsymbol{\Sigma})/||\boldsymbol{y}||$)
+
+# Intrinsic distributions
+
+Directly defined on the circle, e.g.:
+
+* von Mises distribution
+
+$$f(\theta) = [2\pi I_0(\kappa)]^{-1} \exp[\kappa\cos(\theta-\mu)]$$
+
+mean direction = $\mu$
+
+concentration parameter = $\kappa$
+
+mean resultant length = $A_1(\kappa)= I_1(\kappa)/I_0(\kappa)$, see @fisher1995statistical
+
+
+# Wrapped distributions
+
+\begin{figure}
+\centering
+\includegraphics[width = \textwidth]{plots/wrapping.png}
+\label{wrapping}
+\end{figure}
+
+# Projected distributions
+
+\begin{figure}
+\centering
+\includegraphics[width = \textwidth]{plots/embedding4.pdf}
+\label{embedding4}
+\end{figure}
+
+
+# Projected distributions
+
+Instead of inference on the circular outcome, $\theta$, directly we perform 
+inference on underlying bivariate data, $\boldsymbol{\text{Y}} \sim N(\boldsymbol{\mu}, \boldsymbol{I})$.
+
+* Advantage: \textbf{flexible} approach, make use of already existing models for 
+bivariate linear data.
+
+* Disadvantage: $\boldsymbol{\text{Y}}$ and $r$ are latent, need special 
+inference methods (EM algorithm [@presnell1998projected] or \textbf{data
+augmented MCMC sampling} [@nunez2005bayesian]).
+
+* Disadvantage: \textbf{interpretation} on two components instead of on
+circle.
+
+
+# A short example analysis using the R-package bpnreg
+
+\small
+\vspace{0.5cm}
+
+Brunyé, T. T., Burte, H., Houck, L. A., & Taylor, H. A. (2015). The map in our head is not oriented north: Evidence from a real-world environment. PLoS One, 10(9), e0135803.
+
+```{r, echo = FALSE}
+par(mfrow = c(1,2))
+
+plot(as.circular(data %>% filter(sex == "male") %>% select(theta)), stack = TRUE, main = "males")
+plot(as.circular(data %>% filter(sex == "female") %>% select(theta)), stack = TRUE, main = "females")
+```
+
+
+# Fit a circular regression model
+```{r, results = FALSE }
+
+fit <- bpnr(theta ~ sex + age + experience + sbsod,
+            data = data,
+            its = 10000, burn = 100,
+            seed = 101)
+
+```
+
+# Results
+
+Estimated circular means for males and females with average age, experience and Santa Barbara Sense of Direction (SBSOD) score:
+
+\vspace{0.5cm}
+
+\scriptsize
+```{r, results = FALSE}
+coef_circ(fit, type = "categorical", units = "degrees")
+```
+
+
+```{r, echo = FALSE}
+res <- coef_circ(fit, type = "categorical", units = "degrees")
+
+# Means
+round(res$Means, 2)
+```
+
+# Results
+
+Estimated mean resultant length for males and females with average age, experience and Santa Barbara Sense of Direction (SBSOD) score:
+
+\vspace{0.5cm}
+
+\scriptsize
+```{r, echo = FALSE}
+a1 <- fit$B1[,"(Intercept)"]
+a2 <- fit$B2[,"(Intercept)"]
+b1 <- fit$B1[,"sexfemale"]
+b2 <- fit$B2[,"sexfemale"]
+
+zeta   <- sqrt((a1)^2 + (a2)^2)^2/4
+spread <- sqrt((pi * zeta)/2) * exp(-zeta) * (besselI(zeta, 0) + besselI(zeta, 1))
+zeta2   <- sqrt((a1 + b1)^2 + (a2 + b2)^2)^2/4
+spread2 <- sqrt((pi * zeta2)/2) * exp(-zeta2) * (besselI(zeta2, 0) + besselI(zeta2, 1))
+
+out <- rbind(c(mean(spread), mode_est(spread), sd(spread), hpd_est(spread)),
+             c(mean(spread2), mode_est(spread2), sd(spread2), hpd_est(spread2)))
+colnames(out) <- c("mean", "mode", "sd", "LB", "UB")
+rownames(out) <- c("(Intercept)", "sexfemale")
+
+round(out, 2)
+
+```
+
+
+# Results
+\scriptsize
+```{r, echo = FALSE}
+round(coef_circ(fit, type = "continuous")*(180/pi), 2)
+```
+
+# Results
+
+\begin{figure}[H]
+        \centering
+
+\includegraphics[width=0.8\textwidth]{plots/FigurelineSBSODreal.png}
+
+		\label{}
+\end{figure}
+
+Interpretation of coefficients, see @CremersMulderKlugkist2017. 
+
+# Some thoughts on circular statistics and the Libet clock
+
+```{r, echo = FALSE}
+sample_1 <- circular::rvonmises(1000, 2, 10, control.circular = list(units = "hours"))
+sample_2 <- circular::rvonmises(1000, 2, 5, control.circular = list(units = "hours"))
+sample_3 <- circular::rvonmises(1000, 2, 2, control.circular = list(units = "hours"))
+```
+
+```{r, echo = FALSE}
+par(mfrow = c(1,3))
+plot(sample_1, stack = TRUE, template = "clock12", main = "Group 1")
+plot(sample_2, stack = TRUE, template = "clock12", main = "Group 2")
+plot(sample_3, stack = TRUE, template = "clock12", main = "Group 3")
+```
+
+# Some thoughts on circular statistics and the Libet clock
+
+\centering Location
+
+\vspace{0.5cm}
+
+\begin{columns}[T] % align columns
+\begin{column}{.48\textwidth}
+
+\centering Linear analysis:
+\vspace{0.5cm}
+\begin{itemize}
+\item Group 1 mean: `r round(mean(as.numeric(sample_1)), 3)`
+\item Group 2 mean: `r round(mean(as.numeric(sample_2)), 3)`
+\item Group 3 mean: `r round(mean(as.numeric(sample_3)), 3)`
+\end{itemize}
+
+\end{column}%
+\hfill%
+\begin{column}{.48\textwidth}
+
+\centering Circular analysis:
+\vspace{0.5cm}
+\begin{itemize}
+\item Group 1 mean: `r round(mean(sample_1), 3)`
+\item Group 2 mean: `r round(mean(sample_2), 3)`
+\item Group 3 mean: `r round(mean(sample_3), 3)`
+\end{itemize}
+
+\end{column}%
+\end{columns}
+
+# Some thoughts on circular statistics and the Libet clock
+
+\centering Accuracy
+
+\vspace{0.5cm}
+
+\begin{columns}[T] % align columns
+\begin{column}{.48\textwidth}
+
+\centering Linear analysis:
+\vspace{0.5cm}
+\begin{itemize}
+\item Scores converted to 0-180 degree scale, deviance from correct time
+\item linear regression
+\item heterogenous regression models
+\end{itemize}
+
+\end{column}%
+\hfill%
+\begin{column}{.48\textwidth}
+
+\centering Circular analysis:
+\vspace{0.5cm}
+\begin{itemize}
+\item Models that allow for simultaneous modelling of mean and variance (heterogenous)
+\item Projected normal regression (available in R-package `bpnreg`)
+\item Heterogenous von Mises models
+\end{itemize}
+
+\end{column}%
+\end{columns}
+
+# Some thoughts on circular statistics and the Libet clock
+
+\begin{columns}[T] % align columns
+\begin{column}{.48\textwidth}
+
+Linear analysis:
+\vspace{0.5cm}
+\begin{itemize}
+\item Careful with scale and results
+\item Analysis methods easily available
+\end{itemize}
+
+\end{column}%
+\hfill%
+\begin{column}{.48\textwidth}
+
+Circular analysis:
+\vspace{0.5cm}
+\begin{itemize}
+\item Often quite similar to linear analysis
+\item Scale is correct
+\item Analysis methods not always readily available 
+\end{itemize}
+
+\end{column}%
+\end{columns}
+
+
+```{r, echo = FALSE}
+# mean(unclass(c(sample_1, sample_2))-pi)
+# mean(unclass(c(sample_3, sample_4))-pi)
+# 
+# mean_circ(c(sample_1, sample_2)-pi)
+# mean_circ(c(sample_3, sample_4)-pi)
+```
+
+
+# Software
+
+* R-packages:
+  - [`circular`](https://cran.r-project.org/web/packages/circular/index.html): general purpose package
+  - [`bpnreg`](https://cran.r-project.org/web/packages/bpnreg/index.html): Bayesian circular regression and mixed-effects models based on projected normal distribution
+  - [`circglmbayes`](https://cran.r-project.org/web/packages/circglmbayes/index.html): Bayesian circular regression based on von Mises distribution
+  - [`CircSpaceTime`](https://cran.r-project.org/web/packages/CircSpaceTime/index.html): Bayesian spatial and spatio-temporal models.
+
+* Other:
+  - [`CircStat`](https://github.com/circstat/circstat-matlab): general purpose MATLAB toolbox
+
+
+# Suggested literature
+
+* Introductory
+
+  - Batschelet (1981). Circular statistics in biology.
+  - Fisher (1995). Statistical analysis of circular data.
+  - Pewsey, Neuhäuser \& Ruxton (2013). Circular statistics in R.
+  - Ley \& Verdebout (Eds.). (2018). Applied directional statistics: Modern methods and case studies.
+  - Cremers \& Klugkist (2018). [One direction? A tutorial for circular data analysis using R with examples in cognitive psychology.](https://www.frontiersin.org/articles/10.3389/fpsyg.2018.02040/full)
+
+* Advanced (requires mathematical background)
+
+  - Pewsey \& García-Portugués (2020). [Recent advances in directional statistics.](https://arxiv.org/abs/2005.06889)
+  - Mardia \& Jupp (2000) Directional statistics.
+  - Ley \& Verdebout (2017). Modern directional statistics.
+
+
+# References
