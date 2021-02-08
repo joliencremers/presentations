@@ -87,10 +87,6 @@ Eye movements:
 # Time of day / clock times
 \small
 
-Phase difference:
-
-* Puglisi, G., Leonetti, A., Landau, A., Fornia, L., Cerri, G., & Borroni, P. (2017). The role of attention in human motor resonance.
-
 
 Time of day:
 
@@ -229,20 +225,16 @@ mean resultant length = $A_1(\kappa)= I_1(\kappa)/I_0(\kappa)$, see @fisher1995s
 \end{figure}
 
 
-# Projected distributions
+# Projected & wrapped distributions
 
 Instead of inference on the circular outcome, $\theta$, directly we perform 
-inference on underlying bivariate data, $\boldsymbol{\text{Y}} \sim N(\boldsymbol{\mu}, \boldsymbol{I})$.
+inference on underlying bivariate or univariate linear data.
 
-* Advantage: \textbf{flexible} approach, make use of already existing models for 
-bivariate linear data.
+* Advantage: \textbf{flexible} approach, make use of already existing models for linear data.
 
-* Disadvantage: $\boldsymbol{\text{Y}}$ and $r$ are latent, need special 
-inference methods (EM algorithm [@presnell1998projected] or \textbf{data
-augmented MCMC sampling} [@nunez2005bayesian]).
+* Disadvantage: $\boldsymbol{\text{Y}}$ and $r$ are latent.
 
-* Disadvantage: \textbf{interpretation} on two components instead of on
-circle.
+* Disadvantage: \textbf{interpretation} results need to be transformed back to the circle.
 
 
 # A short example analysis using the R-package bpnreg
@@ -396,7 +388,6 @@ plot(sample_3, stack = TRUE, template = "clock12", main = "Group 3")
 \begin{itemize}
 \item Scores converted to 0-180 degree scale, deviance from correct time
 \item linear regression
-\item heterogenous regression models
 \end{itemize}
 
 \end{column}%
@@ -406,7 +397,7 @@ plot(sample_3, stack = TRUE, template = "clock12", main = "Group 3")
 \centering Circular analysis:
 \vspace{0.5cm}
 \begin{itemize}
-\item Models that allow for simultaneous modelling of mean and variance (heterogenous)
+\item Models that allow for simultaneous modeling of mean and variance (heterogenous)
 \item Projected normal regression (available in R-package `bpnreg`)
 \item Heterogenous von Mises models
 \end{itemize}
@@ -457,7 +448,6 @@ Circular analysis:
   - [`circular`](https://cran.r-project.org/web/packages/circular/index.html): general purpose package
   - [`bpnreg`](https://cran.r-project.org/web/packages/bpnreg/index.html): Bayesian circular regression and mixed-effects models based on projected normal distribution
   - [`circglmbayes`](https://cran.r-project.org/web/packages/circglmbayes/index.html): Bayesian circular regression based on von Mises distribution
-  - [`CircSpaceTime`](https://cran.r-project.org/web/packages/CircSpaceTime/index.html): Bayesian spatial and spatio-temporal models.
 
 * Other:
   - [`CircStat`](https://github.com/circstat/circstat-matlab): general purpose MATLAB toolbox
@@ -476,7 +466,7 @@ Circular analysis:
 * Advanced (requires mathematical background)
 
   - Pewsey \& García-Portugués (2020). [Recent advances in directional statistics.](https://arxiv.org/abs/2005.06889)
-  - Mardia \& Jupp (2000) Directional statistics.
+  - Mardia \& Jupp (2000). Directional statistics.
   - Ley \& Verdebout (2017). Modern directional statistics.
 
 
