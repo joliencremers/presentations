@@ -1,5 +1,7 @@
 --- 
-title: "A short introduction to circular data analysis"
+title: |
+  | Circular statistics in cognitive psychology:
+  | A short introduction
 author: "Jolien Cremers"
 date: "February 8th, 2020"
 institute: | 
