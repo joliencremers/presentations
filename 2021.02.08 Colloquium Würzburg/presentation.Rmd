@@ -6,7 +6,6 @@ author: "Jolien Cremers"
 date: "February 8th, 2020"
 institute: | 
   | Section of Biostatistics, University of Copenhagen
-  | Statistics Denmark
   | jcre@sund.ku.dk
 output:
   # ioslides_presentation:

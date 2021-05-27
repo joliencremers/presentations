@@ -1,0 +1,312 @@
+--- 
+title: "The causal effect of early retirement on medication use across sex and occupation: Evidence from Danish administrative data"
+author: "Jolien Cremers$^{1,2}$, Torben Heien Nielsen$^3$, Claus Thorn Ekstrøm$^1$"
+date: "May 28th, 2020"
+institute: 
+   - $^1$University of Copenhagen, Section of Biostatistics, Department of Public Health
+   - $^2$Statistics Denmark
+   - $^3$University of Copenhagen, Center for Economic Behavior and Inequality, Department of Economics
+output:
+  # ioslides_presentation:
+  #   citation_package: natbib
+  #   css: css/style.css
+  #   transition: 0
+  #   self_contained: TRUE
+  beamer_presentation:
+    citation_package: natbib
+header-includes:
+   - \usepackage{colortbl}   
+   - \usepackage{tikz}
+   - \usepackage{amsmath}
+   - \usetikzlibrary{positioning}
+   - \renewcommand{\footnotesize}{\tiny}
+bibliography: paper.bib
+biblio-style: "apalike"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r, echo = FALSE}
+library(ggplot2)
+```
+
+
+## Why? 
+
+Challenges in the literature:
+
+\begin{itemize}
+\item Directionality?
+\item Adequate measures of health
+\end{itemize}
+
+Common patterns:
+
+\begin{itemize}
+\item self-reported health based studies: positive effect\footnote{e.g. Coe \& Zamarro (2011), Eibich (2015), Shai (2018), Gorry, Gorry \& Slavov (2018)}
+\item administrative data: decline in doctors' appointments and hospital utilization\footnote{Bíró \& Elek (2018), Nielsen (2019), Frimmel \& Pruckner (2020), Perdrix (2020), Hallberg, Johansson \& Josephson (2015), Kuusi, Martikainen \& Valkonen (2020)}
+\item mental health \& medication use: mixed results\footnote{Coe \& Zamarro (2011), Mazzonna \& Peracci (2012), Kolodziej \& García-Gómez (2019), Biró \& Elek (2018), Hagen (2018), Perdrix (2020), Gorry et.al. (2018), Frimmel \& Pruckner (2020)}
+\end{itemize}
+
+
+## Why?
+
+Medication data:
+\begin{itemize}
+\item large administrative data source
+\item specific health conditions
+\end{itemize}
+
+
+Approach:
+
+\begin{itemize}
+\item Recent data --> recent reform --> improved identifiability 
+\item Monthly data
+\item Heterogeneity by occupation at age 45-55 \& sex
+\item Improved IV technique for binary outcomes\footnote{Vansteelandt, Bowden, Babnezhad \& Ghoetghebeur (2011)}
+\end{itemize}
+
+
+## Results
+
+Percentage point change in medication use if all would have retired
+
+```{r, echo = FALSE, out.width = "95%", out.length = "95%"}
+AF <- data.frame(c(-0.26, -4.08, 0.3, 0.78, -0.08, 0.66, 0.27, 0.62,
+                   -0.16, -2.81, 0.39, 0.11, 0.04, -1.25, 0.31, -1.11,
+                   -0.35, -4.58, -0.05, 0.63, -0.2, 0.84, 0.34, 1.26,
+                   -0.12, -7.09, 1.47, 3.24, 0.12, 6.01, 0.26, 0.08, 
+                   -0.32, -4.32, 0.29, 0.73, -0.11, 0.74, 0.76, 0.92,
+                   -0.15, -3.87, 0.31, 0.88, -0.04, 0.57, -0.21, 0.11),
+                 c(-0.43, -5.35, 0.1, 0.13, -0.24, -0.42, -0.09, -0.21, 
+                   -0.46, -4.93, 0.06, -1.19, -0.25, -3.07, -0.31, -2.08,
+                   -0.58, -6.53, -0.34, -0.26, -0.41, -0.79, -0.2, 0.10,
+                   -0.71, -13.1, 0.63, 0.65, -0.41, 1.70, -1.13, -2.96,
+                   -0.53, -6.03, 0.00, -0.06, -0.30, -0.74, 0.25, -0.09,
+                   -0.41, -5.81, 0.03, -0.30, -0.29, -1.02, -0.75, -1.36),
+                 c(-0.10, -2.8, 0.5, 1.44, 0.08, 1.74, 0.64, 1.45,
+                   0.14, -0.70, 0.71, 1.40, 0.34, 0.55, 0.92, 0.57,
+                   -0.11, -2.62, 0.25, 1.53, 0.02, 2.48, 0.88, 2.43,
+                   0.47, -1.07, 2.32, 5.84, 0.65, 10.30, 1.65, 3.13,
+                   -0.11, -2.62, 0.57, 1.52, 0.09, 2.22, 1.27, 1.93,
+                   0.11, -1.93, 0.60, 2.07, 0.21, 2.17, 0.32, 1.58),
+                 rep(c("all", "painkillers", "hypertension", "mental health"), 12),
+                 rep(c("overall", "blue-collar", "lower white-collar", "upper white-collar", "females", "males"), each = 8),
+                 rep(c("short-term", "long-term"), each = 4, times = 6),
+                 rep(c(453991, 220805, 118360, 55695, 186114, 91181, 95656, 46326, 222659, 108317, 231332, 112488), each = 4))
+
+colnames(AF) <- c("estimate", "lb", "ub", "medication", "subgroup", "time", "sample size")
+
+AF$time <- relevel(factor(AF$time), ref = "short-term")
+AF$medication <- factor(AF$medication, levels = c("all", "painkillers", "hypertension", "mental health"))
+AF$subgroup <- relevel(factor(AF$subgroup, levels = c("overall", "blue-collar", "lower white-collar", "upper white-collar", "females", "males")), ref = "overall")
+
+pd <- position_dodge(0.5)
+
+ggplot(AF, aes(x=medication, y=estimate, colour=subgroup)) + 
+    facet_wrap(~ time, ncol = 1) +
+    geom_errorbar(aes(ymin=lb, ymax=ub), width=0.2, position=pd) +
+    geom_point(position=pd, size=1.5, shape=19) +
+    ylab("Attributable Fraction") +
+    xlab("Medication type") +
+    geom_hline(yintercept = 0, size = 0.3, colour = "black")
+
+```
+
+## Design: reform
+
+\begin{table}
+\centering
+\caption{Ages at which Early Retirement Pension (ERP) is available according to date of birth.}
+\begin{tabular}{ ll }
+\hline\hline
+ Date of Birth & ERP age \\ \hline
+ $<$ 1954 & 60 \\  
+ $\geq$ 01-January-1954 & 60.5 \\   
+ $\geq$ 01-July-1954 & 61 \\   
+ $\geq$ 01-January-1955 & 61.5 \\   
+ $\geq$ 01-July-1955 & 62 \\     
+ $\geq$ 01-January-1956 & 62.5 \\  
+ $\geq$ 01-July-1956 & 63 \\         
+ $\geq$ 01-January-1959 & 63.5 \\
+ $\geq$ 01-July-1959 & 64 \\   
+ $>$ 1963 & computed in relation \\
+ & to life expectancy \\\hline\hline
+\end{tabular}
+\label{tab:ERP_age}
+\end{table}
+
+## Design: IV model
+
+\begin{figure}
+\label{fig:dagreal}
+\centering
+	\large{\begin{tikzpicture}[%
+		->,
+		>=stealth,
+		node distance=1cm,
+		pil/.style={
+			->,
+			thick,
+			shorten =2pt,}
+		]
+		\node (1) {YOB};
+		\node[right=of 1] (2) {ERP};
+		\node[below right = of 1](3){S, O, MH};
+		\node[above right = of 2](4){UC};
+		\node[right=of 2] (5) {MED};
+		\draw [->] (1) to (2);
+		\draw [->] (2) to (5);
+		\draw [->] (3) to (2);
+		\draw [->] (3) to (5);
+		\draw [->] (4) to (2);
+		\draw [->] (4) to (5);
+	\end{tikzpicture}}
+\end{figure}
+
+\begin{align}\label{eq:tsls}\nonumber
+&P(\text{MED}_{i} = 1) = logit^{-1}(\beta_0 + \beta_1\text{ERP}_i + \beta_2\text{S}_i + \beta_3\text{O}_i + \beta_4\text{MH}_i + u_i) \\ \nonumber
+&P(\text{ERP}_i = 1) =  logit^{-1}(\gamma_0 + \gamma_1\text{YOB}_i + \gamma_2\text{S}_i + \gamma_3\text{O}_i + \gamma_4\text{MH}_i + \nu_i)
+\end{align}
+
+## Design: variables
+
+\begin{itemize}
+
+\item ERP: Early retirement pension, indicator of retirement between age 60-60.5
+\item YOB: year of birth, either pre-1954 (unaffected cohorts) or $\geq$ 1954 (affected cohorts)
+\item MED: medication use, indicator of medication use between age 60-60.5 (short-term) or 60-63 (long-term)
+\item MH: medication history, categorical medication use between age 59.5-60, 0, $\leq$7, $\leq$31 or >31 daily defined doses a month
+\item S: sex (male/female)
+\item O: longest held occupation type between age 45-55.
+
+\end{itemize}
+
+## Design: medication types
+
+Painkillers: M02AA, N02A, N02B (antiinflammatory preparations, non-steroids for topical use, opioids, other analgesics and antipyretics)\footnote{N02BE01, N02BE05, N02BA01, N02BA51, N02BB51 and 200 mg M01AE01 are not included}
+
+Medication to reduce blood pressure: C02, C03, C07, C08, C09 (antihypertensives, diuretics, beta blocking agents, calcium channel blockers, agents acting on the renin-angiotensin system)
+
+Antidepressants and medications for anxiety and sleep disorders: N05B N05C, N06A, N06C (anxiolytics, hypnotics and sedatives, antidepressants, psycholeptics and psychoanaleptics in combination)
+
+
+## Design: labour market attachment
+
+\begin{figure}
+ \centering
+  \includegraphics[width = 0.7\linewidth]{Plots/Pop_tilstand_prop_new.pdf}
+  \label{fig:attachment_pop}
+\end{figure}
+
+
+## IV assumptions
+
+\begin{itemize}
+\item IV associated with exposure
+\item Exclusion restriction
+\item Randomization assumption
+\end{itemize}
+
+## Results
+
+Percentage point change in medication use if all would have retired
+
+```{r, echo = FALSE, out.width = "95%", out.length = "95%"}
+
+ggplot(AF, aes(x=medication, y=estimate, colour=subgroup)) + 
+    facet_wrap(~ time, ncol = 1) +
+    geom_errorbar(aes(ymin=lb, ymax=ub), width=0.2, position=pd) +
+    geom_point(position=pd, size=1.5, shape=19) +
+    ylab("Attributable Fraction") +
+    xlab("Medication type") +
+    geom_hline(yintercept = 0, size = 0.3, colour = "black")
+
+```
+
+
+## Discussion
+
+\begin{itemize}
+\item Upper white-collar, income/wealth effects
+\item No long-term effects?
+\item Effects on amount of medication use (IV models for count/zero-inflated outcomes)
+\item Different types of medication, split up mental health medication?
+\end{itemize}
+
+## References {.allowframebreaks}
+
+Bíró, A., & Elek, P. (2018). How does retirement affect healthcare expenditures? Evidence from a change in retirement age. Health Economics, 27, 803-818.
+
+Coe, N. B., & Zamarro, G. (2011). Retirement effects on health in Europe. Journal of Health Economics, 30(1), 77–86.
+
+Eibich, P. (2015). Understanding the effect of retirement on health: Mechanisms and heterogeneity. Journal of Health Economics, 43, 1-12.
+
+Frimmel, W., & Pruckner, G.J. (2020). Retirement and healthcare utilization. Journal of Public Economics, 184, 104164.
+
+Gorry, A., Gorry, D., & Slavov, S.N. (2018). Does retirement improve health and life satisfaction? Health Economics, 27, 2067-2068.
+
+Hagen, J. (2018). The effects of increasing the normal retirement age on health care utilization and mortality. Journal of Population Economics, 31, 193-234. 
+
+Hallberg, D.P., Johansson, P., & Josephson, M. (2015). Is an early retirement offer good for your health? Quasi-experimental evidence from the army. Journal of Health Economics, 44, 274-285.
+
+Kolodziej, I. W. K., & García-Gómez, P. (2019). Saved by retirement: Beyond the mean effect on mental health. Social Science and Medicine, 225, 85–97.
+
+Kuusi, T., Martikainen, P., & Valkonen, T. (2020). The influence of old-age retirement on health: Causal evidence from the Finnish register data. The Journal of the Economics of Ageing, 100257.
+
+Mazzonna, F, & Peracchi, F (2012), Aging, Cognitive abilities and retirement? European Economic Review, 56(4), 691-710
+
+Nielsen, N.F. (2019). Sick of retirement? Journal of health economics, 65, 133-152.
+
+Shai, O. (2018). Is retirement good for men’s health? Evidence using a change in the retirement age in Israel. Journal of Health Economics, 57, 15-30.
+
+Vansteelandt, S., Bowden, J., Babanezhad, M., & Goetghebeur, E. (2011). On instrumental variables estimation of causal odds ratios. Statistical science: a review journal of the Institute of Mathematical Statistics, 26(3), 403-422.
+
+## Descriptives
+
+\begin{figure}
+ \centering
+  \includegraphics[width = 0.9\linewidth]{Plots/Descriptives.png}
+  \label{fig:descriptives}
+\end{figure}
+
+## Medication frequencies
+
+\begin{table}
+\centering
+\tiny
+\caption{Most frequently used types of prescription medication ($\leq$15\%) in the period 2008-2017 among individuals aged 58-63 that have used prescription medication at least once.}
+\begin{tabular}{ lll }
+\hline\hline
+ medication type (ATC) & percentage & subtypes ($\leq$10\%)\\ \hline
+ antiinfectives for systemic use (J01) & 68\% & penicillins \\
+ antiinflammatory and antirheumatic products (M01) & 46\% & ibuprofen\\
+ analgesics (N02) & 45\% & paracetamol, tramadol \\
+ agents acting on the renin-angiotensin system (C09) & 32\% & ACE inhibitors (plain), \\
+ & & Angiotensin II receptor blockers (plain)\\
+ lipid modifying agents (C10) & 30\% & HMG C0A reductase inhibitors\\
+ drugs for acid related disorders (A02) & 29\% & proton pump inhibitors\\
+ opthalmologicals (S01) & 28\%& antibiotics\\
+ corticosteroids, dermatological preparations (D07) & 28\% & corticosteroids, (potent, group III) \\
+ psycholeptics (N05) & 21\% & benzodiazepine derivatives + related drugs \\
+ antithrombotic agents (B01) & 21\%& platelet aggregation inhibitors\\
+ diuretics (C03) & 20\%& thiazides and potassium in combination\\
+ calcium channel blockers (C08) & 19\% & dihydropyridine derivatives\\
+ antifungals for dermatological use (D01) & 17\%& imidazole and triazole derivatives\\
+ beta blocking agents (C07) & 17\% & beta blocking agents (selective)\\
+ psychoanaleptics (N06) & 17\% & selective serotonin reuptake inhibitors\\
+ drugs for obstructive airway diseases (R03) & 16\% & selective beta-2-adrenoreceptor agonists\\
+ cough and cold preparations (R05) & 16\% & -\\
+ sex hormones and modulators of the genital system (G03) & 15\%& estradiol\\
+ \hline\hline 
+\end{tabular}
+\label{tab:MED_freq}
+\end{table}
+
+
+
+
+
