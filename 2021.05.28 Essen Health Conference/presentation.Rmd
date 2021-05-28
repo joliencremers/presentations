@@ -235,6 +235,14 @@ ggplot(AF, aes(x=medication, y=estimate, colour=subgroup)) +
 ```
 
 
+## Conclusion
+
+\begin{itemize}
+\item Decrease in overall medication use and use of painkillers
+\item Heterogeneous effects across medication and population groups
+\item Effect not persistent long term
+\end{itemize}
+
 ## Discussion
 
 \begin{itemize}
