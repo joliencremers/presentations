@@ -154,8 +154,8 @@ Approach:
 ## IV model
 
 \begin{align}\label{eq:tsls}\nonumber
-&P(\text{MED}_{i} = 1) = logit^{-1}(\beta_0 + \beta_1\text{ERP}_i + \beta_2\text{S}_i + \beta_3\text{O}_i + \beta_4\text{MH}_i + u_i) \\ \nonumber
-&P(\text{ERP}_i = 1) =  logit^{-1}(\gamma_0 + \gamma_1\text{YOB}_i + \gamma_2\text{S}_i + \gamma_3\text{O}_i + \gamma_4\text{MH}_i + \nu_i)
+&P(\text{MED}_{i} = 1) = logit^{-1}(\beta_0 + \beta_1\text{ERP}_i + \beta_2\text{S}_i + \beta_3\text{O}_i + \beta_4\text{MH}_i) \\ \nonumber
+&P(\text{ERP}_i = 1) =  logit^{-1}(\gamma_0 + \gamma_1\text{YOB}_i + \gamma_2\text{S}_i + \gamma_3\text{O}_i + \gamma_4\text{MH}_i)
 \end{align}
 
 
