@@ -84,16 +84,18 @@ Can be written as a poisson model for (piecewise constant) hazard rates. Conveni
 
 # Modelling issues/challenges (cont.)
 3. Recurrent events
-    - Repeated observations of the same event, e.g. doctor visits, birth of children, change of job
+    - Repeated observations of the same event, e.g. doctor visits, birth of children, change of job (@Amorim2015-lp)
 4. Time varying covariates
 5. Time varying effects ($\boldsymbol{\gamma}_t$)
-6. Endogeneity of covariates
+6. Random effects, frailty (@Balan2020-ae)
+7. Endogeneity of covariates
     - Bias if association between covariate and event is bidirectional.
-    - Solution: joint models (economics: simultaneous equations, simulatneous hazard), with multiple outcomes (time-to-event and longitudinal)
-7. Causality
-8. Including lots and lots of covariates and (non-linear) associations for many individuals over a long time period
+    - Solution: joint models (economics: simultaneous equations, simulatneous hazard), with multiple outcomes (@Rizopoulos2012-fi)
+8. Causality
+9. Including lots and lots of covariates and (non-linear) associations for many individuals over a long time period
 
 # 
+
 
 # Time-to-event analysis: basic quantities (with equations)
 
